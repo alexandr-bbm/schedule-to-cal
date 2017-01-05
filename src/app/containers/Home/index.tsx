@@ -1,6 +1,6 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
-import { getSchedule, authorizeGoogleCal, addScheduleToGoogleCal } from 'modules/schedule'
+import { getSchedule, authorizeGoogleCal, addScheduleToGoogleCal } from 'schedule/actions'
 
 import CircularProgress from 'material-ui/CircularProgress';
 import { RaisedButton } from "material-ui";

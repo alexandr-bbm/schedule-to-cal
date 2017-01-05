@@ -1,7 +1,6 @@
-import { ILessonsData } from "modules/schedule/parser/models";
+import { ILessonsData } from "services/schedule/models";
 
-/** Type Definitions */
-export interface ISchedule {
+export interface IScheduleState {
   isFetching?: boolean;
   isAuthorized?: boolean;
   error?: boolean;

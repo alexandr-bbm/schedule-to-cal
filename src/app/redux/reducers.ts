@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
-import { scheduleReducer } from './modules/schedule';
+import { scheduleReducer } from './schedule';
 import { reducer as formReducer } from 'redux-form';
 
 const { reducer } = require('redux-connect');

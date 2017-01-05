@@ -1,6 +1,3 @@
-/**
- * Интерфейс для пары.
- */
 interface ILesson {
   subject: string;
   title: string;

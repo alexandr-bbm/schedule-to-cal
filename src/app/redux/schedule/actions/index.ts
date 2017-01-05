@@ -1,67 +1,9 @@
-import { ISchedule, IScheduleAction } from 'models/schedule';
-import scheduleService from './parser/ScheduleService'
-import { ILessonsData } from "./parser/models";
-import calendarAPIService from "modules/schedule/parser/CalendarAPIService";
+import { IScheduleAction } from 'models/schedule';
+import scheduleService from 'services/schedule/ScheduleService'
+import { ILessonsData } from "services/schedule/models";
+import calendarAPIService from "services/schedule/CalendarAPIService";
+import * as a from '../constants';
 
-/** Action Types */
-export const GET_REQUEST: string = 'schedule/GET_REQUEST';
-export const GET_SUCCESS: string = 'schedule/GET_SUCCESS';
-export const GET_FAILURE: string = 'schedule/GET_FAILURE';
-export const SET: string = 'schedule/SET';
-
-export const SET_LOG_MESSAGE: string = 'schedule/SET_LOG_MESSAGE';
-export const CAL_AUTHORIZE_SUCCESS: string = 'schedule/CAL_AUTHORIZE_SUCCESS';
-
-/** Initial State */
-const initialState: ISchedule = {
-  isFetching: false,
-  isAuthorized: false,
-  lessonsData: null,
-};
-
-/** Reducer */
-export function scheduleReducer(state = initialState, action: IScheduleAction) {
-  switch (action.type) {
-    case GET_REQUEST:
-      return Object.assign({}, state, {
-        isFetching: true,
-      });
-
-    case GET_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: false,
-      });
-
-    case SET:
-      return Object.assign({}, state, {
-        lessonsData: action.payload.lessonsData,
-      });
-
-    case CAL_AUTHORIZE_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthorized: true,
-      });
-
-    case GET_FAILURE:
-      return Object.assign({}, state, {
-        isFetching: false,
-        message: action.payload.message,
-        error: true,
-      });
-
-    case SET_LOG_MESSAGE:
-      return {
-        ...state,
-        logMessage: action.payload.logMessage
-      };
-
-    default:
-      return state;
-  }
-}
-
-/** Async Action Creator */
 /** Fetch schedule from university website and saves it to store. */
 export function getSchedule(url) {
   return dispatch => {
@@ -77,10 +19,7 @@ export function getSchedule(url) {
   };
 }
 
-/**
- *  Async action creator.
- *  Uploads the lessons from store to google calendar.
- */
+/** Uploads the lessons from store to google calendar. */
 export const addScheduleToGoogleCal = (calendarName: string) => (dispatch, getState) => {
   const {lessonsData} = getState().schedule;
 
@@ -97,7 +36,7 @@ export function authorizeGoogleCal() {
   return dispatch => {
     calendarAPIService
       .authorize()
-      .then(() => dispatch({type: CAL_AUTHORIZE_SUCCESS}))
+      .then(() => dispatch({type: a.CAL_AUTHORIZE_SUCCESS}))
       .catch(err => dispatch(scheduleFailure(err)));
   }
 }
@@ -105,14 +44,14 @@ export function authorizeGoogleCal() {
 /** Action Creator */
 export function scheduleRequest(): IScheduleAction {
   return {
-    type: GET_REQUEST,
+    type: a.GET_REQUEST,
   };
 }
 
 /** Action Creator */
 export function scheduleSetLogMessage(logMessage: string): IScheduleAction {
   return {
-    type: SET_LOG_MESSAGE,
+    type: a.SET_LOG_MESSAGE,
     payload: {
       logMessage
     }
@@ -122,13 +61,13 @@ export function scheduleSetLogMessage(logMessage: string): IScheduleAction {
 /** Action Creator */
 export function scheduleSuccess() {
   return {
-    type: GET_SUCCESS,
+    type: a.GET_SUCCESS,
   };
 
 }/** Action Creator */
 export function setSchedule(lessonsData: ILessonsData) {
   return {
-    type: SET,
+    type: a.SET,
     payload: {
       lessonsData,
     },
@@ -138,7 +77,7 @@ export function setSchedule(lessonsData: ILessonsData) {
 /** Action Creator */
 export function scheduleFailure(message: any): IScheduleAction {
   return {
-    type: GET_FAILURE,
+    type: a.GET_FAILURE,
     payload: {
       message,
     },

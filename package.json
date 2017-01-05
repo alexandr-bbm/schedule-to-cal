@@ -1,5 +1,5 @@
 {
-  "name": "schedule-tocal",
+  "name": "schedule-to-cal",
   "version": "0.1.0",
   "description": "Direct import of university schedule to Google Calendar",
   "main": "build/server.js",

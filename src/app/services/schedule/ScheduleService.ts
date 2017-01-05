@@ -1,6 +1,6 @@
-import { ILessonsData, ILesson, IGoogleCalEvent } from "./models";
+import { ILessonsData, ILesson, IGoogleCalEvent } from './models';
 require('jquery');
-require('./lib/jquery.xdomainajax');
+require('./lib/jquery.xdomainajax.js');
 
 let instance = null;
 
