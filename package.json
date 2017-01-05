@@ -4,15 +4,15 @@
   "description": "Direct import of university schedule to Google Calendar",
   "main": "build/server.js",
   "scripts": {
+    "dev": "npm run build && npm run start",
     "build": "webpack --config config/webpack/index.js",
     "build:prod": "cross-env NODE_ENV=production npm run build",
-    "dev": "npm run build && npm run start",
+    "postbuild": "webpack --config config/webpack/server.js",
     "start": "node build/server.js",
     "start:prod": "cross-env NODE_ENV=production npm start",
+    "deploy": "npm run build:prod && git commit -am 'rebuild' --allow-empty && git push heroku master",
     "test": "node_modules/.bin/karma start config/test/karma.conf.js",
-    "lint": "node_modules/.bin/tslint \"src/**/**.ts*\"",
-    "postbuild": "webpack --config config/webpack/server.js",
-    "deploy": "git push heroku master"
+    "lint": "node_modules/.bin/tslint \"src/**/**.ts*\""
   },
   "author": "Alexander Gazizov <alexandr.bbm@gmail.com>",
   "homepage": "https://schedule-to-cal.herokuapp.com/",

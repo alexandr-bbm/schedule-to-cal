@@ -25805,7 +25805,7 @@ module.exports =
 	var React = __webpack_require__(3);
 	__webpack_require__(332);
 	exports.GithubRibbon = function () {
-	    return (React.createElement("a", { className: "github-fork-ribbon", href: "http://url.to-your.repo", title: "Fork me on GitHub" }, "Fork me on GitHub"));
+	    return (React.createElement("a", { className: "github-fork-ribbon", href: "https://github.com/alexandr-bbm/schedule-to-cal", target: "_blank", title: "Fork me on GitHub" }, "Fork me on GitHub"));
 	};
 
 
@@ -25935,8 +25935,9 @@ module.exports =
 /***/ function(module, exports) {
 
 	module.exports = {
-		"app.js": "js/app.js",
-		"app.js.map": "js/app.js.map"
+		"app.css": "css/app.4b07faed392a6b053db9.css",
+		"app.js": "js/app.4ef9da789323ab3577a6.js",
+		"vendor.js": "js/vendor.7195732350a5ba1d0179.js"
 	};
 
 /***/ },
