@@ -5,12 +5,14 @@
   "main": "build/server.js",
   "scripts": {
     "dev": "npm run build && npm run start",
+    "deploy": "npm run build:prod && git add build && git commit -am 'rebuild' --allow-empty && git push heroku master",
+    "prebuild": "npm run clean",
     "build": "webpack --config config/webpack/index.js",
     "build:prod": "cross-env NODE_ENV=production npm run build",
     "postbuild": "webpack --config config/webpack/server.js",
     "start": "node build/server.js",
     "start:prod": "cross-env NODE_ENV=production npm start",
-    "deploy": "npm run build:prod && git commit -am 'rebuild' --allow-empty && git push heroku master",
+    "clean": "rimraf build",
     "test": "node_modules/.bin/karma start config/test/karma.conf.js",
     "lint": "node_modules/.bin/tslint \"src/**/**.ts*\""
   },
