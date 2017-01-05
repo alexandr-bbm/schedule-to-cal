@@ -10,7 +10,8 @@ let instance = null;
 
 class ScheduleService {
 
-  $grabbedDOM: JQuery;
+  private $grabbedDOM: JQuery;
+  public lessonsData: ILessonsData;
 
   constructor() {
     if (!instance) {
@@ -111,11 +112,13 @@ class ScheduleService {
       }
     }
 
-    return ({
+    this.lessonsData = {
       lessons,
       isTwoWeeks: true,
       startMonday
-    });
+    };
+
+    return this.lessonsData;
   }
 
   /** Четная ли текущая неделя по версии рапсисания */

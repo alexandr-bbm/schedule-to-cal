@@ -10,7 +10,6 @@
     "outDir": "build",
     "module": "commonjs",
     "target": "es5",
-    "lib": ["dom", "es6"],
     "sourceMap": true,
     "inlineSourceMap": false,
     "inlineSources": false,

@@ -3,6 +3,7 @@ import scheduleService from 'services/schedule/ScheduleService'
 import { ILessonsData } from "services/schedule/models";
 import calendarAPIService from "services/schedule/CalendarAPIService";
 import * as a from '../constants';
+const root = require('window-or-global');
 
 /** Fetch schedule from university website and saves it to store. */
 export function getSchedule(url) {
@@ -11,24 +12,24 @@ export function getSchedule(url) {
     dispatch(scheduleSetLogMessage(`Загружаем расписание с ${url}`));
     return scheduleService.fetchTPU(url)
       .then($schedule => {
-        const lessonsData: ILessonsData = scheduleService.processTPU($schedule as JQuery);
-        dispatch(scheduleSetLogMessage(`Расписание успешно загружено.`));
-        dispatch(setSchedule(lessonsData));
+        scheduleService.processTPU($schedule as JQuery);
       })
       .catch(err => dispatch(scheduleFailure(err)));
   };
 }
 
-/** Uploads the lessons from store to google calendar. */
-export const addScheduleToGoogleCal = (calendarName: string) => (dispatch, getState) => {
-  const {lessonsData} = getState().schedule;
-
-  dispatch(scheduleSetLogMessage(`Начинаем добавлять расписание в Google Календарь`));
+/** Uploads the lessons from store to google calendar.
+ */
+export const addScheduleToGoogleCal = (calendarName: string) => dispatch => {
   calendarAPIService
-    .addLessonsSchedule(calendarName, lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
+    .addLessonsSchedule(calendarName, scheduleService.lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
     .then(() => {
       dispatch(scheduleSetLogMessage(`Расписание успешно загружено в ваш Google Календарь`));
       dispatch(scheduleSuccess());
+      // todo implement in component
+      root.setTimeout(() => {
+        dispatch(scheduleSetLogMessage(''));
+      }, 2000)
     })
 };
 

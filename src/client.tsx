@@ -1,5 +1,4 @@
-// import * as e6p from 'es6-promise';
-// (e6p as any).polyfill();
+require('es6-shim');
 import 'isomorphic-fetch';
 
 import * as React from 'react';

@@ -21305,6 +21305,7 @@ module.exports =
 	var ScheduleService_1 = __webpack_require__(244);
 	var CalendarAPIService_1 = __webpack_require__(248);
 	var a = __webpack_require__(173);
+	var root = __webpack_require__(247);
 	/** Fetch schedule from university website and saves it to store. */
 	function getSchedule(url) {
 	    return function (dispatch) {
@@ -21312,23 +21313,24 @@ module.exports =
 	        dispatch(scheduleSetLogMessage("\u0417\u0430\u0433\u0440\u0443\u0436\u0430\u0435\u043C \u0440\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0441 " + url));
 	        return ScheduleService_1.default.fetchTPU(url)
 	            .then(function ($schedule) {
-	            var lessonsData = ScheduleService_1.default.processTPU($schedule);
-	            dispatch(scheduleSetLogMessage("\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u043E."));
-	            dispatch(setSchedule(lessonsData));
+	            ScheduleService_1.default.processTPU($schedule);
 	        })
 	            .catch(function (err) { return dispatch(scheduleFailure(err)); });
 	    };
 	}
 	exports.getSchedule = getSchedule;
-	/** Uploads the lessons from store to google calendar. */
-	exports.addScheduleToGoogleCal = function (calendarName) { return function (dispatch, getState) {
-	    var lessonsData = getState().schedule.lessonsData;
-	    dispatch(scheduleSetLogMessage("\u041D\u0430\u0447\u0438\u043D\u0430\u0435\u043C \u0434\u043E\u0431\u0430\u0432\u043B\u044F\u0442\u044C \u0440\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0432 Google \u041A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044C"));
+	/** Uploads the lessons from store to google calendar.
+	 */
+	exports.addScheduleToGoogleCal = function (calendarName) { return function (dispatch) {
 	    CalendarAPIService_1.default
-	        .addLessonsSchedule(calendarName, lessonsData, function (msg) { return dispatch(scheduleSetLogMessage(msg)); })
+	        .addLessonsSchedule(calendarName, ScheduleService_1.default.lessonsData, function (msg) { return dispatch(scheduleSetLogMessage(msg)); })
 	        .then(function () {
 	        dispatch(scheduleSetLogMessage("\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u043E \u0432 \u0432\u0430\u0448 Google \u041A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044C"));
 	        dispatch(scheduleSuccess());
+	        // todo implement in component
+	        root.setTimeout(function () {
+	            dispatch(scheduleSetLogMessage(''));
+	        }, 2000);
 	    });
 	}; };
 	function authorizeGoogleCal() {
@@ -21491,11 +21493,12 @@ module.exports =
 	                startMonday.setDate(startMonday.getDate() - 7);
 	            }
 	        }
-	        return ({
+	        this.lessonsData = {
 	            lessons: lessons,
 	            isTwoWeeks: true,
 	            startMonday: startMonday
-	        });
+	        };
+	        return this.lessonsData;
 	    };
 	    /** Четная ли текущая неделя по версии рапсисания */
 	    ScheduleService.prototype.isCurrentWeekEven = function () {
@@ -25934,8 +25937,9 @@ module.exports =
 /***/ function(module, exports) {
 
 	module.exports = {
-		"app.js": "js/app.js",
-		"app.js.map": "js/app.js.map"
+		"app.css": "css/app.68b9b5990d04fc342ea9.css",
+		"app.js": "js/app.ceb1c8375154b44d0cfc.js",
+		"vendor.js": "js/vendor.5038a72a1df19ae498d5.js"
 	};
 
 /***/ },
