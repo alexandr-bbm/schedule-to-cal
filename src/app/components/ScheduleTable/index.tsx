@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
-import { ILesson } from "../../services/schedule/models";
+import { ILesson } from "services/schedule/models";
 import { uniqBy, groupBy } from "lodash";
 
 const THS = [
@@ -25,12 +25,17 @@ export const getLessonsForRender = (lessons: ILesson[]): Array<any[]> => {
     out[i] = [];
     for (let j = 0; j < colsNum; j++) {
       if (j === 0) {
-        out[i][j] = startTimes[i]
+        out[i][j] =  {text: startTimes[i]};
       } else {
         const lessonForDay = groupedByTime[startTimes[i]].find(l => l.dayIdx === j - 1);
-        out[i][j] = lessonForDay ?
-          `${lessonForDay.subject} ${lessonForDay.lessonType}`
-          : '';
+        out[i][j] = lessonForDay
+          ?
+          {
+            text: `${lessonForDay.subject} ${lessonForDay.lessonType}`,
+            id: lessonForDay.id
+          }
+          :
+          {text: ''};
       }
     }
   }
@@ -49,7 +54,20 @@ const getCellStyle = (idx) => (
   }
 );
 
-class ScheduleTable extends React.Component<any, any> {
+interface IProps {
+  lessonsForWeek: Array<ILesson>;
+  isDeleteMode: boolean;
+  onDeleteRequest: (id) => void;
+}
+
+class ScheduleTable extends React.Component<IProps, any> {
+
+  onCellClick = (e) => {
+    if (this.props.isDeleteMode) {
+      const id = e.getAttribute('data-id');
+      this.props.onDeleteRequest(id)
+    }
+  };
 
   public render() {
     const lessons = getLessonsForRender(this.props.lessonsForWeek);
@@ -57,10 +75,7 @@ class ScheduleTable extends React.Component<any, any> {
       return <p>Произошла ошибка</p>
     }
     return (
-      <Table
-        selectable={false}
-        className={this.props.className}
-      >
+      <Table selectable={false}>
         <TableHeader
           displaySelectAll={false}
           adjustForCheckbox={false}
@@ -76,13 +91,14 @@ class ScheduleTable extends React.Component<any, any> {
         <TableBody displayRowCheckbox={false}>
           {
             lessons.map(row => (
-              <TableRow>
+              <TableRow onCellClick={this.onCellClick}>
                 {row.map((col, idx) => (
                   <TableRowColumn
                     style={getCellStyle(idx)}
                     className="schedule-cell"
+                    data-id={col.id}
                   >
-                    {col}
+                    {col.text}
                   </TableRowColumn>
                 ))}
               </TableRow>

@@ -16,5 +16,6 @@ export interface IScheduleAction {
     message?: any;
     logMessage?: any;
     lessonsData?: ILessonsData
+    id?: string
   };
 }

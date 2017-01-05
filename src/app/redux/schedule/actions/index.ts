@@ -89,3 +89,12 @@ export function scheduleFailure(message: any): IScheduleAction {
     },
   };
 }
+
+export function deleteLesson(id: string) {
+  return {
+    type: a.DELETE_LESSON,
+    payload: {
+      id
+    }
+  }
+}
