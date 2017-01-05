@@ -1,6 +1,7 @@
 import { ILessonsData, ILesson, IGoogleCalEvent } from './models';
 require('jquery');
 require('./lib/jquery.xdomainajax.js');
+const shortid = require('shortid');
 
 let instance = null;
 
@@ -88,11 +89,12 @@ class ScheduleService {
             title: $(this).find('.subject').attr('title'),
             lessonType: $(this).find('.lesson-type').text(),
             room: $(this).find('.room a').text(),
-            teacher: $(this).find('.group-teacher').text(),
+            teacher: $(this).find('.group-teacher').text().replace(/\\n\s+/, ''),
             timeStart: startTimes[timeIndex - 1],
             dayIdx: dayIdx - 1, // 0 - Пн, 1 - Вт и т.д.
             weekIdx: weekIdx, // 0 - нечет, 1 - чет
             duration: 95,
+            id: shortid.generate()
           })
         })
       })

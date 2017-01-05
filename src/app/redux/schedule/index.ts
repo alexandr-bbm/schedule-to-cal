@@ -1,11 +1,12 @@
 import { IScheduleState, IScheduleAction } from '../../models/schedule';
 import * as a from './constants';
+import {MOCK_DATA} from './mock';
 
 /** Initial State */
 const initialState: IScheduleState = {
   isFetching: false,
   isAuthorized: false,
-  lessonsData: null,
+  lessonsData: JSON.parse(MOCK_DATA),
 };
 
 /** Reducer */

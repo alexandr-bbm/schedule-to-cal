@@ -1,13 +1,13 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
 import { getSchedule, authorizeGoogleCal, addScheduleToGoogleCal } from 'schedule/actions'
+import { Link } from 'react-router';
 
 import CircularProgress from 'material-ui/CircularProgress';
 import { RaisedButton } from "material-ui";
 
 import { GetScheduleForm } from 'components/GetScheduleForm';
-import { CenteredCircleLayout } from "components/CenteredCircleLayout";
-import { GithubRibbon } from 'components/GithubRibbon';
+import { CenteredPaper } from 'components/CenteredPaper';
 
 
 @connect(
@@ -15,6 +15,7 @@ import { GithubRibbon } from 'components/GithubRibbon';
     isFetching: state.schedule.isFetching,
     isAuthorized: state.schedule.isAuthorized,
     logMessage: state.schedule.logMessage,
+    lessonsData: state.schedule.lessonsData,
   }),
 )
 class Home extends React.Component<any, any> {
@@ -22,8 +23,8 @@ class Home extends React.Component<any, any> {
   private onScheduleRequest = ({url, calendarName}) => {
     const {dispatch} = this.props;
 
-    dispatch(getSchedule(url))
-      .then(() => dispatch(addScheduleToGoogleCal(calendarName)))
+    dispatch(getSchedule(url));
+      // .then(() => dispatch(addScheduleToGoogleCal(calendarName)))
   };
 
   private onAuthRequest = () => {
@@ -32,10 +33,10 @@ class Home extends React.Component<any, any> {
 
 
   public render() {
-    const {isFetching, isAuthorized, logMessage} = this.props;
+    const {isFetching, isAuthorized, logMessage, lessonsData} = this.props;
 
     return (
-      <CenteredCircleLayout>
+      <CenteredPaper circle={true}>
         {
           isFetching ?
             <CircularProgress />
@@ -49,8 +50,12 @@ class Home extends React.Component<any, any> {
               </div>
         }
         <p>{logMessage}</p>
-        <GithubRibbon />
-      </CenteredCircleLayout>
+        {lessonsData &&
+          <Link to="schedule">
+            <RaisedButton label="К расписанию"/>
+          </Link>
+        }
+      </CenteredPaper>
     );
   }
 }

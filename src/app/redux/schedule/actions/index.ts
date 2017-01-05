@@ -3,6 +3,7 @@ import scheduleService from 'services/schedule/ScheduleService'
 import { ILessonsData } from "services/schedule/models";
 import calendarAPIService from "services/schedule/CalendarAPIService";
 import * as a from '../constants';
+import { getLessonsForRender } from "components/ScheduleTable/index";
 const root = require('window-or-global');
 
 /** Fetch schedule from university website and saves it to store. */
@@ -13,6 +14,9 @@ export function getSchedule(url) {
     return scheduleService.fetchTPU(url)
       .then($schedule => {
         scheduleService.processTPU($schedule as JQuery);
+        dispatch(setSchedule(scheduleService.lessonsData));
+        dispatch(scheduleSuccess());
+        dispatch(scheduleSetLogMessage(`Расписание с сайта ТПУ загружено`));
       })
       .catch(err => dispatch(scheduleFailure(err)));
   };
@@ -21,6 +25,7 @@ export function getSchedule(url) {
 /** Uploads the lessons from store to google calendar.
  */
 export const addScheduleToGoogleCal = (calendarName: string) => dispatch => {
+  dispatch(scheduleRequest());
   calendarAPIService
     .addLessonsSchedule(calendarName, scheduleService.lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
     .then(() => {

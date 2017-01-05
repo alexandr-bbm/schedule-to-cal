@@ -8,6 +8,7 @@ interface ILesson {
   dayIdx: number;
   weekIdx: number;
   duration: number;
+  id: string;
 }
 
 interface ILessonsData {
