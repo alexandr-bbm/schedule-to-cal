@@ -1,7 +1,6 @@
 const appConfig = require('../../../../config/main');
 import * as React from 'react';
 import * as Helmet from 'react-helmet';
-import { Header } from 'components';
 require('./style.css');
 
 class App extends React.Component<any, any> {
@@ -11,7 +10,6 @@ class App extends React.Component<any, any> {
     return (
       <section className={s.appContainer}>
         <Helmet {...appConfig.app} {...appConfig.app.head}/>
-        <Header />
         {this.props.children}
       </section>
     );

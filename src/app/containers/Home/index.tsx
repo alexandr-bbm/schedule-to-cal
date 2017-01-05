@@ -3,10 +3,11 @@ const {connect} = require('react-redux');
 import { getSchedule, authorizeGoogleCal, addScheduleToGoogleCal } from 'modules/schedule'
 
 import CircularProgress from 'material-ui/CircularProgress';
+import { RaisedButton } from "material-ui";
 
 import { GetScheduleForm } from 'components/GetScheduleForm';
-import { RaisedButton } from "material-ui";
-import { CenteredCircleLayout } from "components/CenteredCircleLayout/index";
+import { CenteredCircleLayout } from "components/CenteredCircleLayout";
+import { GithubRibbon } from 'components/GithubRibbon';
 
 
 @connect(
@@ -48,6 +49,7 @@ class Home extends React.Component<any, any> {
               </div>
         }
         <p>{logMessage}</p>
+        <GithubRibbon />
       </CenteredCircleLayout>
     );
   }
