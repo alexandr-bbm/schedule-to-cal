@@ -1,13 +1,13 @@
 import { IScheduleState, IScheduleAction } from '../../models/schedule';
 import * as a from './constants';
-import {MOCK_DATA} from './mock';
 
 /** Initial State */
 const initialState: IScheduleState = {
   isFetching: false,
   isAuthorized: false,
-  lessonsData: JSON.parse(MOCK_DATA),
-  stepIndex: 0
+  lessonsData: null,
+  stepIndex: 0,
+  logMessage: null
 };
 
 /** Reducer */
@@ -30,6 +30,9 @@ export function scheduleReducer(state = initialState, action: IScheduleAction) {
         ...state,
         lessonsData: action.payload.lessonsData,
       };
+
+    case a.RESET:
+      return initialState;
 
     case a.CAL_AUTHORIZE_SUCCESS:
       return {

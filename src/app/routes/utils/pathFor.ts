@@ -1,4 +1,6 @@
 export default {
   'INDEX': '/',
-  'SCHEDULE_EDIT': '/schedule-edit'
+  'SCHEDULE_EDIT': '/edit',
+  'SCHEDULE_IMPORT': '/upload',
+  'SCHEDULE_SUCCESS': '/success',
 }

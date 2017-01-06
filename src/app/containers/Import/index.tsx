@@ -1,14 +1,13 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
-import { getSchedule } from 'schedule/actions'
+import { authorizeGoogleCal, addScheduleToGoogleCal } from 'schedule/actions'
 import { browserHistory } from 'react-router';
 
 import CircularProgress from 'material-ui/CircularProgress';
-const {VKontakteButton} = require("react-social");
 
 import pathFor from 'routes/utils/pathFor';
 
-import { GetScheduleForm } from 'components/GetScheduleForm';
+import { ImportScheduleForm } from 'components/ImportScheduleForm';
 import { CenteredPaper } from 'components/CenteredPaper';
 
 
@@ -18,13 +17,15 @@ import { CenteredPaper } from 'components/CenteredPaper';
     logMessage: state.schedule.logMessage,
   }),
 )
-class Home extends React.Component<any, any> {
+class Import extends React.Component<any, any> {
 
-  private onScheduleLoadRequest = ({url}) => {
+  private onScheduleImportRequest = ({calendarName}) => {
     const {dispatch} = this.props;
-    dispatch(getSchedule(url))
-      .then(() => browserHistory.push(pathFor.SCHEDULE_EDIT));
+    dispatch(authorizeGoogleCal())
+      .then(() => dispatch(addScheduleToGoogleCal(calendarName)))
+      .then(() => browserHistory.push(pathFor.SCHEDULE_SUCCESS))
   };
+
 
   public render() {
     const {isFetching, logMessage} = this.props;
@@ -35,7 +36,7 @@ class Home extends React.Component<any, any> {
             isFetching ?
               <CircularProgress />
               :
-              <GetScheduleForm onSubmit={this.onScheduleLoadRequest}/>
+              <ImportScheduleForm onSubmit={this.onScheduleImportRequest}/>
           }
           <p>{logMessage}</p>
         </CenteredPaper>
@@ -43,4 +44,4 @@ class Home extends React.Component<any, any> {
   }
 }
 
-export { Home }
+export { Import }

@@ -4,6 +4,8 @@
   text-align: center;
   height: 100%;
   max-width: 900px;
+  display: flex;
+  flex-direction: column;
 }
 body, html, main, .appContainer {
   height: 100%;

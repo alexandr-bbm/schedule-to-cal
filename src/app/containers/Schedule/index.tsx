@@ -1,10 +1,10 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
-import { browserHistory } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import pathFor from 'routes/utils/pathFor';
 import stepFor from 'helpers/stepFor';
 
-import { deleteLesson, setStepIndex } from 'schedule/actions';
+import { deleteLesson, resetApp } from 'schedule/actions';
 
 import { groupBy } from 'lodash';
 
@@ -14,7 +14,6 @@ import { RaisedButton } from "material-ui";
 import { CenteredPaper } from 'components/CenteredPaper';
 import { ScheduleTable } from 'components/ScheduleTable';
 import { ILesson } from "services/schedule/models";
-import { ScheduleStepper } from 'components/ScheduleStepper/index';
 
 const THS = [
   'Время',
@@ -62,7 +61,6 @@ export const getLessonsForRender = (lessons: ILesson[]): Array<any[]> => {
 @connect(
   state => ({
     lessonsByWeek: getLessonsByWeek(state),
-    stepIndex: state.schedule.stepIndex,
   }),
 )
 class Schedule extends React.Component<any, any> {
@@ -77,17 +75,29 @@ class Schedule extends React.Component<any, any> {
     })
   };
 
-  onLessonDeleteRequest = id => {
-    this.props.dispatch(deleteLesson(id));
-  };
+  onLessonDeleteRequest = id => this.props.dispatch(deleteLesson(id));
 
   onExitRequest = () => {
-    this.props.dispatch(setStepIndex(stepFor.IMPORT_SCHEDULE));
+    browserHistory.push(pathFor.SCHEDULE_IMPORT);
+  };
+
+  onExitToIndexRequest = () => {
+    this.props.dispatch(resetApp());
     browserHistory.push(pathFor.INDEX);
   };
 
   public render() {
-    const {lessonsByWeek, stepIndex} = this.props;
+    const {lessonsByWeek} = this.props;
+
+    if (!lessonsByWeek) {
+      return <CenteredPaper circle={true}>
+          <p>Возникла ошибка</p>
+          <div>
+            <RaisedButton label="На главную" onTouchTap={this.onExitToIndexRequest} />
+          </div>
+        </CenteredPaper>
+    }
+
     const firstWeekLessons = getLessonsForRender(lessonsByWeek[0]);
     const secondWeekLessons = getLessonsForRender(lessonsByWeek[1]);
     const {deleteMode} = this.state;
@@ -100,7 +110,6 @@ class Schedule extends React.Component<any, any> {
 
     return (
       <div>
-        <ScheduleStepper stepIndex={stepIndex}/>
         <CenteredPaper width="900px" height="auto" padding="10px" className="mb3 mt3">
           <div className="dn" style={{width: '300px'}}>
             <Toggle label="Режим удаления" onToggle={this.onDeleteModeToggle}/>

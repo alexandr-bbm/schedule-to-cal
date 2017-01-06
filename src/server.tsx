@@ -14,7 +14,7 @@ const { ReduxAsyncConnect, loadOnServer } = require('redux-connect');
 import { configureStore } from './app/redux/store';
 import routes from './app/routes';
 
-import { Html } from './app/containers/Html';
+import { Html } from './app/containers/base/Html';
 const manifest = require('../build/manifest.json');
 const root = require('window-or-global');
 

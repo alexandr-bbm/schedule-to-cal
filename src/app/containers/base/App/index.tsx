@@ -1,9 +1,9 @@
-const appConfig = require('../../../../config/main');
+const appConfig = require('../../../../../config/main');
 import * as React from 'react';
 import * as Helmet from 'react-helmet';
-require('./style.css');
 import { GithubRibbon } from 'components/GithubRibbon';
-
+import { ScheduleStepper } from 'components/ScheduleStepper/index';
+require('./style.css');
 
 class App extends React.Component<any, any> {
   public render() {
@@ -12,6 +12,7 @@ class App extends React.Component<any, any> {
     return (
       <section className={s.appContainer}>
         <Helmet {...appConfig.app} {...appConfig.app.head}/>
+        <ScheduleStepper route={this.props.location.pathname} />
         {this.props.children}
         <GithubRibbon />
       </section>

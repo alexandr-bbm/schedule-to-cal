@@ -26,12 +26,9 @@ export function getSchedule(url) {
  */
 export const addScheduleToGoogleCal = (calendarName: string) => (dispatch, getState) => {
   dispatch(scheduleRequest());
-  calendarAPIService
+  return calendarAPIService
     .addLessonsSchedule(calendarName, getState().schedule.lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
-    .then(() => {
-      dispatch(scheduleSetLogMessage(`Расписание успешно загружено в ваш Google Календарь`));
-      dispatch(scheduleSuccess());
-    })
+    .then(() => dispatch(scheduleSuccess()))
 };
 
 export function authorizeGoogleCal() {
@@ -93,3 +90,4 @@ export function deleteLesson(id: string) {
 }
 
 export const setStepIndex = createAction(a.SET_STEP_INDEX);
+export const resetApp = createAction(a.RESET);
