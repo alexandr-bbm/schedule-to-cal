@@ -1,48 +1,6 @@
 import * as React from 'react';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
-import { ILesson } from "services/schedule/models";
-import { uniqBy, groupBy } from "lodash";
 
-const THS = [
-  'Время',
-  'Пн',
-  'Вт',
-  'Ср',
-  'Чт',
-  'Пт',
-  'Сб',
-];
-
-export const getLessonsForRender = (lessons: ILesson[]): Array<any[]> => {
-  let out = [];
-  const groupedByTime = groupBy(lessons, 'timeStart');
-  const startTimes = Object.keys(groupedByTime);
-
-  const rowsNum = startTimes.length;
-  const colsNum = THS.length;
-
-  for (let i = 0; i < rowsNum; i++) {
-    out[i] = [];
-    for (let j = 0; j < colsNum; j++) {
-      if (j === 0) {
-        out[i][j] =  {text: startTimes[i]};
-      } else {
-        const lessonForDay = groupedByTime[startTimes[i]].find(l => l.dayIdx === j - 1);
-        out[i][j] = lessonForDay
-          ?
-          {
-            text: `${lessonForDay.subject} ${lessonForDay.lessonType}`,
-            id: lessonForDay.id
-          }
-          :
-          {text: ''};
-      }
-    }
-  }
-
-  return out;
-
-};
 
 const getCellStyle = (idx) => (
   {
@@ -55,33 +13,38 @@ const getCellStyle = (idx) => (
 );
 
 interface IProps {
-  lessonsForWeek: Array<ILesson>;
+  lessonsForWeek: any;
   isDeleteMode: boolean;
   onDeleteRequest: (id) => void;
+  tableHeaders: string[];
 }
+
+const TIME_COL_NUM = 1;
 
 class ScheduleTable extends React.Component<IProps, any> {
 
-  onCellClick = (e) => {
-    if (this.props.isDeleteMode) {
-      const id = e.getAttribute('data-id');
+  onCellClick (row, col) {
+    console.log(`ScheduleTable isDeleteMode: ${this.props.isDeleteMode}`);
+    if (this.props.isDeleteMode && col !== TIME_COL_NUM) {
+      const arrCol = col - 1;
+      const { id } = this.props.lessonsForWeek[row][arrCol];
       this.props.onDeleteRequest(id)
     }
   };
 
   public render() {
-    const lessons = getLessonsForRender(this.props.lessonsForWeek);
+    const {lessonsForWeek: lessons, tableHeaders} = this.props;
     if (!lessons.length) {
       return <p>Произошла ошибка</p>
     }
     return (
-      <Table selectable={false}>
+      <Table selectable={false} onCellClick={this.onCellClick.bind(this)}>
         <TableHeader
           displaySelectAll={false}
           adjustForCheckbox={false}
         >
           <TableRow>
-            {THS.map((day, idx) => (
+            {tableHeaders.map((day, idx) => (
               <TableHeaderColumn style={getCellStyle(idx)}>
                 {day}
               </TableHeaderColumn>
@@ -91,7 +54,7 @@ class ScheduleTable extends React.Component<IProps, any> {
         <TableBody displayRowCheckbox={false}>
           {
             lessons.map(row => (
-              <TableRow onCellClick={this.onCellClick}>
+              <TableRow>
                 {row.map((col, idx) => (
                   <TableRowColumn
                     style={getCellStyle(idx)}

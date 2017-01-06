@@ -7,7 +7,7 @@ export class CenteredPaper extends React.Component<any, any> {
   public render () {
     const paperStyle = {
       display: 'flex',
-      alignItems: 'center',
+      // alignItems: 'center',
       height: this.props.height || '400px',
       width: this.props.width || '400px',
       flexDirection: 'column',

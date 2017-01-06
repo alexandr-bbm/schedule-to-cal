@@ -7,6 +7,7 @@ const initialState: IScheduleState = {
   isFetching: false,
   isAuthorized: false,
   lessonsData: JSON.parse(MOCK_DATA),
+  stepIndex: 0
 };
 
 /** Reducer */
@@ -50,6 +51,7 @@ export function scheduleReducer(state = initialState, action: IScheduleAction) {
         ...state,
         logMessage: action.payload.logMessage
       };
+
     case a.DELETE_LESSON:
       const newLessons = state.lessonsData.lessons.filter(lesson => lesson.id !== action.payload.id);
       return {
@@ -58,6 +60,12 @@ export function scheduleReducer(state = initialState, action: IScheduleAction) {
           ...state.lessonsData,
           lessons: newLessons
         }
+      };
+
+    case a.SET_STEP_INDEX:
+      return {
+        ...state,
+        stepIndex: action.payload
       };
 
     default:

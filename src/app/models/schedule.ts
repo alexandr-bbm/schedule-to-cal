@@ -7,6 +7,7 @@ export interface IScheduleState {
   lessonsData?: ILessonsData;
   message?: any;
   logMessage?: any;
+  stepIndex?: number
 }
 
 export interface IScheduleAction {

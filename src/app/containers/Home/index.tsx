@@ -1,13 +1,18 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
-import { getSchedule, authorizeGoogleCal, addScheduleToGoogleCal } from 'schedule/actions'
-import { Link } from 'react-router';
+import { getSchedule, authorizeGoogleCal, addScheduleToGoogleCal, setStepIndex } from 'schedule/actions'
+import { Link, browserHistory } from 'react-router';
 
 import CircularProgress from 'material-ui/CircularProgress';
 import { RaisedButton } from "material-ui";
 
+import pathFor from 'routes/utils/pathFor';
+import stepFor from 'helpers/stepFor';
+
 import { GetScheduleForm } from 'components/GetScheduleForm';
+import { ImportScheduleForm } from 'components/ImportScheduleForm';
 import { CenteredPaper } from 'components/CenteredPaper';
+import { ScheduleStepper } from 'components/ScheduleStepper/index';
 
 
 @connect(
@@ -16,46 +21,66 @@ import { CenteredPaper } from 'components/CenteredPaper';
     isAuthorized: state.schedule.isAuthorized,
     logMessage: state.schedule.logMessage,
     lessonsData: state.schedule.lessonsData,
+    stepIndex: state.schedule.stepIndex,
   }),
 )
 class Home extends React.Component<any, any> {
 
-  private onScheduleRequest = ({url, calendarName}) => {
+  private onScheduleLoadRequest = ({url}) => {
     const {dispatch} = this.props;
-
-    dispatch(getSchedule(url));
+    dispatch(getSchedule(url))
+      .then(() => dispatch(setStepIndex(stepFor.EDIT_SCHEDULE)))
+      .then(() => browserHistory.push(pathFor.SCHEDULE_EDIT));
       // .then(() => dispatch(addScheduleToGoogleCal(calendarName)))
   };
 
-  private onAuthRequest = () => {
-    this.props.dispatch(authorizeGoogleCal())
+  private onScheduleImportRequest = ({calendarName}) => {
+    const {dispatch} = this.props;
+    dispatch(authorizeGoogleCal())
+      .then(() => dispatch(addScheduleToGoogleCal(calendarName)))
+      .then(() => dispatch(setStepIndex(stepFor.SUCCESS)))
   };
 
+   private resetStepper = () => {
+     this.props.dispatch(setStepIndex(stepFor.LOAD_SCHEDULE))
+   };
+
+  private getStepContent = (stepIndex) => {
+    switch (stepIndex) {
+      case 0:
+        return <GetScheduleForm onSubmit={this.onScheduleLoadRequest}/>;
+
+      case 1:
+        return <Link to={pathFor.SCHEDULE_EDIT}>
+          <RaisedButton label="К расписанию"/>
+        </Link>;
+
+      case 2:
+        return <ImportScheduleForm onSubmit={this.onScheduleImportRequest}/>;
+
+      default:
+        return <RaisedButton label="В начало" onTouchTap={this.resetStepper}/>;
+    }
+  };
 
   public render() {
-    const {isFetching, isAuthorized, logMessage, lessonsData} = this.props;
+    const {isFetching, logMessage, stepIndex} = this.props;
 
     return (
-      <CenteredPaper circle={true}>
-        {
-          isFetching ?
-            <CircularProgress />
-            :
-            isAuthorized ?
-              <GetScheduleForm onSubmit={this.onScheduleRequest}/>
-              :
+      <div>
+        <ScheduleStepper stepIndex={stepIndex} />
+        <CenteredPaper circle={true}>
+          {
+            isFetching ?
               <div>
-                <p>Сервис импортирует расписание ТПУ в Google Календарь.</p>
-                <RaisedButton onTouchTap={this.onAuthRequest} label="ok"/>
+                <CircularProgress />
               </div>
-        }
-        <p>{logMessage}</p>
-        {lessonsData &&
-          <Link to="schedule">
-            <RaisedButton label="К расписанию"/>
-          </Link>
-        }
-      </CenteredPaper>
+              :
+              this.getStepContent(stepIndex)
+          }
+          <p>{logMessage}</p>
+        </CenteredPaper>
+      </div>
     );
   }
 }

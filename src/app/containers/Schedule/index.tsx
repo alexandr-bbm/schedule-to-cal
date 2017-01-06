@@ -1,29 +1,77 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
+import { browserHistory } from 'react-router';
+import pathFor from 'routes/utils/pathFor';
+import stepFor from 'helpers/stepFor';
 
-import { deleteLesson } from 'schedule/actions';
+import { deleteLesson, setStepIndex } from 'schedule/actions';
 
 import { groupBy } from 'lodash';
 
 import Toggle from 'material-ui/Toggle';
+import { RaisedButton } from "material-ui";
 
 import { CenteredPaper } from 'components/CenteredPaper';
 import { ScheduleTable } from 'components/ScheduleTable';
+import { ILesson } from "services/schedule/models";
+import { ScheduleStepper } from 'components/ScheduleStepper/index';
+
+const THS = [
+  'Время',
+  'Пн',
+  'Вт',
+  'Ср',
+  'Чт',
+  'Пт',
+  'Сб',
+];
 
 const getLessonsByWeek = state => state.schedule.lessonsData && groupBy(state.schedule.lessonsData.lessons, 'weekIdx');
 
+export const getLessonsForRender = (lessons: ILesson[]): Array<any[]> => {
+  let out = [];
+  const groupedByTime = groupBy(lessons, 'timeStart');
+  const startTimes = Object.keys(groupedByTime);
+
+  const rowsNum = startTimes.length;
+  const colsNum = THS.length;
+
+  for (let i = 0; i < rowsNum; i++) {
+    out[i] = [];
+    for (let j = 0; j < colsNum; j++) {
+      if (j === 0) {
+        out[i][j] = {text: startTimes[i]};
+      } else {
+        const lessonForDay = groupedByTime[startTimes[i]].find(l => l.dayIdx === j - 1);
+        out[i][j] = lessonForDay
+          ?
+          {
+            text: `${lessonForDay.subject} ${lessonForDay.lessonType}`,
+            id: lessonForDay.id
+          }
+          :
+          {text: ''};
+      }
+    }
+  }
+
+  return out;
+
+};
+
 @connect(
   state => ({
-    lessonsByWeek: getLessonsByWeek(state)
+    lessonsByWeek: getLessonsByWeek(state),
+    stepIndex: state.schedule.stepIndex,
   }),
 )
 class Schedule extends React.Component<any, any> {
 
   state = {
-    deleteMode: false
+    deleteMode: true
   };
 
-  onDeleteModeToggle = value => {
+  onDeleteModeToggle = (event, value) => {
     this.setState({
       deleteMode: value
     })
@@ -33,29 +81,45 @@ class Schedule extends React.Component<any, any> {
     this.props.dispatch(deleteLesson(id));
   };
 
+  onExitRequest = () => {
+    this.props.dispatch(setStepIndex(stepFor.IMPORT_SCHEDULE));
+    browserHistory.push(pathFor.INDEX);
+  };
+
   public render() {
-    const {lessonsByWeek} = this.props;
+    const {lessonsByWeek, stepIndex} = this.props;
+    const firstWeekLessons = getLessonsForRender(lessonsByWeek[0]);
+    const secondWeekLessons = getLessonsForRender(lessonsByWeek[1]);
     const {deleteMode} = this.state;
+
+    const commonTableProps = {
+      isDeleteMode: deleteMode,
+      onDeleteRequest: this.onLessonDeleteRequest,
+      tableHeaders: THS,
+    };
 
     return (
       <div>
+        <ScheduleStepper stepIndex={stepIndex}/>
         <CenteredPaper width="900px" height="auto" padding="10px" className="mb3 mt3">
-          <div style={{width: '300px'}}>
+          <div className="dn" style={{width: '300px'}}>
             <Toggle label="Режим удаления" onToggle={this.onDeleteModeToggle}/>
           </div>
+          <span className="mr3">Кликайте по парам, чтобы их удалить</span>
+          <span>
+            <RaisedButton label="Перейти к импорту" onTouchTap={this.onExitRequest} primary={true} />
+          </span>
         </CenteredPaper>
-        <CenteredPaper width="900px" className="mb3 mt3">
+        <CenteredPaper width="900px" height="auto" className="mb3 mt3">
           <ScheduleTable
-            lessonsForWeek={lessonsByWeek[0]}
-            isDeleteMode={deleteMode}
-            onDeleteRequest={this.onLessonDeleteRequest}
+            {...commonTableProps}
+            lessonsForWeek={firstWeekLessons}
           />
         </CenteredPaper>
-        <CenteredPaper width="900px" className="mb3 mt3">
+        <CenteredPaper width="900px" height="auto" className="mb3 mt3">
           <ScheduleTable
-            lessonsForWeek={lessonsByWeek[1]}
-            isDeleteMode={deleteMode}
-            onDeleteRequest={this.onLessonDeleteRequest}
+            {...commonTableProps}
+            lessonsForWeek={secondWeekLessons}
           />
         </CenteredPaper>
       </div>

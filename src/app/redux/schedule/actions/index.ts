@@ -3,7 +3,7 @@ import scheduleService from 'services/schedule/ScheduleService'
 import { ILessonsData } from "services/schedule/models";
 import calendarAPIService from "services/schedule/CalendarAPIService";
 import * as a from '../constants';
-import { getLessonsForRender } from "components/ScheduleTable/index";
+import { createAction } from 'redux-actions';
 const root = require('window-or-global');
 
 /** Fetch schedule from university website and saves it to store. */
@@ -16,7 +16,7 @@ export function getSchedule(url) {
         scheduleService.processTPU($schedule as JQuery);
         dispatch(setSchedule(scheduleService.lessonsData));
         dispatch(scheduleSuccess());
-        dispatch(scheduleSetLogMessage(`Расписание с сайта ТПУ загружено`));
+        dispatch(scheduleSetLogMessage(''));
       })
       .catch(err => dispatch(scheduleFailure(err)));
   };
@@ -24,23 +24,19 @@ export function getSchedule(url) {
 
 /** Uploads the lessons from store to google calendar.
  */
-export const addScheduleToGoogleCal = (calendarName: string) => dispatch => {
+export const addScheduleToGoogleCal = (calendarName: string) => (dispatch, getState) => {
   dispatch(scheduleRequest());
   calendarAPIService
-    .addLessonsSchedule(calendarName, scheduleService.lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
+    .addLessonsSchedule(calendarName, getState().schedule.lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
     .then(() => {
       dispatch(scheduleSetLogMessage(`Расписание успешно загружено в ваш Google Календарь`));
       dispatch(scheduleSuccess());
-      // todo implement in component
-      root.setTimeout(() => {
-        dispatch(scheduleSetLogMessage(''));
-      }, 2000)
     })
 };
 
 export function authorizeGoogleCal() {
   return dispatch => {
-    calendarAPIService
+    return calendarAPIService
       .authorize()
       .then(() => dispatch({type: a.CAL_AUTHORIZE_SUCCESS}))
       .catch(err => dispatch(scheduleFailure(err)));
@@ -48,11 +44,7 @@ export function authorizeGoogleCal() {
 }
 
 /** Action Creator */
-export function scheduleRequest(): IScheduleAction {
-  return {
-    type: a.GET_REQUEST,
-  };
-}
+export const scheduleRequest = createAction(a.GET_REQUEST);
 
 /** Action Creator */
 export function scheduleSetLogMessage(logMessage: string): IScheduleAction {
@@ -71,6 +63,7 @@ export function scheduleSuccess() {
   };
 
 }/** Action Creator */
+
 export function setSchedule(lessonsData: ILessonsData) {
   return {
     type: a.SET,
@@ -98,3 +91,5 @@ export function deleteLesson(id: string) {
     }
   }
 }
+
+export const setStepIndex = createAction(a.SET_STEP_INDEX);
