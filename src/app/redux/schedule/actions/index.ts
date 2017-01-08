@@ -1,9 +1,9 @@
 import { IScheduleAction } from 'models/schedule';
 import scheduleService from 'services/schedule/ScheduleService'
-import { ILessonsData } from "services/schedule/models";
 import calendarAPIService from "services/schedule/CalendarAPIService";
 import * as a from '../constants';
 import { createAction } from 'redux-actions';
+import { groupBy } from 'lodash';
 const root = require('window-or-global');
 
 /** Fetch schedule from university website and saves it to store. */
@@ -14,7 +14,14 @@ export function getSchedule(url) {
     return scheduleService.fetchTPU(url)
       .then($schedule => {
         scheduleService.processTPU($schedule as JQuery);
-        dispatch(setSchedule(scheduleService.lessonsData));
+
+        const lessonsByWeek = groupBy(scheduleService.lessonsData.lessons, 'weekIdx');
+
+        dispatch(setSchedule({
+          0: scheduleService.getLessonsTableArray(lessonsByWeek[0]),
+          1: scheduleService.getLessonsTableArray(lessonsByWeek[1]),
+        }));
+
         dispatch(scheduleSuccess());
         dispatch(scheduleSetLogMessage(''));
       })
@@ -27,8 +34,10 @@ export function getSchedule(url) {
 export const addScheduleToGoogleCal = (calendarName: string) => (dispatch, getState) => {
   dispatch(scheduleRequest());
   return calendarAPIService
+    // fixme refactor
     .addLessonsSchedule(calendarName, getState().schedule.lessonsData, msg => dispatch(scheduleSetLogMessage(msg)))
     .then(() => dispatch(scheduleSuccess()))
+    .catch(err => dispatch(scheduleFailure(err)));
 };
 
 export function authorizeGoogleCal() {
@@ -61,14 +70,6 @@ export function scheduleSuccess() {
 
 }/** Action Creator */
 
-export function setSchedule(lessonsData: ILessonsData) {
-  return {
-    type: a.SET,
-    payload: {
-      lessonsData,
-    },
-  };
-}
 
 /** Action Creator */
 export function scheduleFailure(message: any): IScheduleAction {
@@ -91,3 +92,4 @@ export function deleteLesson(id: string) {
 
 export const setStepIndex = createAction(a.SET_STEP_INDEX);
 export const resetApp = createAction(a.RESET);
+export const setSchedule = createAction(a.SET);

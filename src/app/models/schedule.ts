@@ -1,10 +1,15 @@
-import { ILessonsData } from "services/schedule/models";
+import { ILessonForRender } from "services/schedule/models";
+
+export interface ILessonsByWeek {
+  0: Array<ILessonForRender[]>,
+  1?: Array<ILessonForRender[]>,
+}
 
 export interface IScheduleState {
   isFetching?: boolean;
   isAuthorized?: boolean;
   error?: boolean;
-  lessonsData?: ILessonsData;
+  lessonsByWeek?: ILessonsByWeek
   message?: any;
   logMessage?: any;
   stepIndex?: number
@@ -16,7 +21,10 @@ export interface IScheduleAction {
     count?: number;
     message?: any;
     logMessage?: any;
-    lessonsData?: ILessonsData
+    lessonsByWeek?: {
+      0: Array<ILessonForRender[]>,
+      1?: Array<ILessonForRender[]>,
+    };
     id?: string
   };
 }

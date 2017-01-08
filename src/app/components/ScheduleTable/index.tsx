@@ -24,7 +24,6 @@ const TIME_COL_NUM = 1;
 class ScheduleTable extends React.Component<IProps, any> {
 
   onCellClick (row, col) {
-    console.log(`ScheduleTable isDeleteMode: ${this.props.isDeleteMode}`);
     if (this.props.isDeleteMode && col !== TIME_COL_NUM) {
       const arrCol = col - 1;
       const { id } = this.props.lessonsForWeek[row][arrCol];

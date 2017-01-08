@@ -1,7 +1,8 @@
-import { ILessonsData, ILesson, IGoogleCalEvent } from './models';
+import { ILessonsData, ILesson, IGoogleCalEvent, ILessonForRender } from './models';
 require('jquery');
 require('./lib/jquery.xdomainajax.js');
 const shortid = require('shortid');
+import { groupBy } from 'lodash';
 
 let instance = null;
 
@@ -13,6 +14,15 @@ class ScheduleService {
 
   private $grabbedDOM: JQuery;
   public lessonsData: ILessonsData;
+  public TABLE_HEAD = [
+    'Время',
+    'Пн',
+    'Вт',
+    'Ср',
+    'Чт',
+    'Пт',
+    'Сб',
+  ];
 
   constructor() {
     if (!instance) {
@@ -167,6 +177,66 @@ class ScheduleService {
     }
   }
 
+  public getLessonForRender(lesson: ILesson): ILessonForRender {
+    const {timeStart, dayIdx, weekIdx, duration, id} = lesson;
+    return {
+      text: lesson.subject + ' ' + lesson.lessonType + ' ' + lesson.room,
+      timeStart,
+      dayIdx,
+      weekIdx,
+      duration,
+      id,
+    }
+  }
+
+  public getLessonsForRender(lessons: ILesson[]): ILessonForRender[] {
+    return lessons.map(l => this.getLessonForRender(l));
+  }
+
+  /**
+   * Преобразует данные в удобный для отображения таблицы вид.
+   * @param lessons
+   * @returns {Array} Двумерный массив для таблицы, включающий названия дней недели и времена начала пар.
+   */
+  public getLessonsTableArray(lessons: ILesson[]): Array<any[]> {
+    // Проверка, что все переданные пары соответствуют одной неделе.
+    const sameWeek = lessons.every(lesson => lesson.weekIdx === lessons[0].weekIdx);
+    if (!sameWeek) {
+      throw new Error('lessons must be of the same week');
+    }
+
+    let out = [];
+    const groupedByTime = groupBy(this.getLessonsForRender(lessons), 'timeStart');
+    const startTimes = Object.keys(groupedByTime);
+
+    const rowsNum = startTimes.length;
+    const colsNum = this.TABLE_HEAD.length;
+
+    for (let i = 0; i < rowsNum; i++) {
+      out[i] = [];
+      for (let j = 0; j < colsNum; j++) {
+        if (j === 0) {
+          out[i][j] = {text: startTimes[i]}; // todo remove and implement in component.render()
+        } else {
+          const currentDayIdx = j - 1;
+          const lessonForDay = groupedByTime[startTimes[i]].find(l => l.dayIdx === currentDayIdx);
+          out[i][j] = lessonForDay
+            ?
+            lessonForDay
+            :
+            {
+              text: '',
+              timeStart: startTimes[i],
+              dayIdx: currentDayIdx,
+              weekIdx: lessons[0].weekIdx,
+              duration: 95,
+              id: shortid.generate(),
+            };
+        }
+      }
+    }
+    return out;
+  };
 }
 
 export default new ScheduleService();

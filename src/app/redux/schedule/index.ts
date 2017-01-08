@@ -5,7 +5,7 @@ import * as a from './constants';
 const initialState: IScheduleState = {
   isFetching: false,
   isAuthorized: false,
-  lessonsData: null,
+  lessonsByWeek: null,
   stepIndex: 0,
   logMessage: null
 };
@@ -28,7 +28,7 @@ export function scheduleReducer(state = initialState, action: IScheduleAction) {
     case a.SET:
       return {
         ...state,
-        lessonsData: action.payload.lessonsData,
+        lessonsByWeek: action.payload,
       };
 
     case a.RESET:
@@ -55,15 +55,15 @@ export function scheduleReducer(state = initialState, action: IScheduleAction) {
         logMessage: action.payload.logMessage
       };
 
-    case a.DELETE_LESSON:
-      const newLessons = state.lessonsData.lessons.filter(lesson => lesson.id !== action.payload.id);
-      return {
-        ...state,
-        lessonsData: {
-          ...state.lessonsData,
-          lessons: newLessons
-        }
-      };
+    // case a.DELETE_LESSON:
+    //   // const newLessons = state.lessons.filter(lesson => lesson.id !== action.payload.id);
+    //   return {
+    //     ...state,
+    //     lessons: {
+    //       ...state.lessons,
+    //       lessons: newLessons
+    //     }
+    //   };
 
     case a.SET_STEP_INDEX:
       return {

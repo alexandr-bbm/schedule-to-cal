@@ -11,6 +11,15 @@ interface ILesson {
   id: string;
 }
 
+interface ILessonForRender {
+  text: string;
+  timeStart: string;
+  dayIdx: number;
+  weekIdx: number;
+  duration: number;
+  id: string;
+}
+
 interface ILessonsData {
   lessons: ILesson[];
   isTwoWeeks: boolean;
@@ -30,4 +39,4 @@ interface IGoogleCalEvent {
   recurrence?: string[]
 }
 
-export {ILesson, ILessonsData, IGoogleCalEvent}
+export {ILesson, ILessonsData, IGoogleCalEvent, ILessonForRender}

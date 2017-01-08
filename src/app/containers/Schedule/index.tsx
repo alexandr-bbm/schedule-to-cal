@@ -1,66 +1,24 @@
 import * as React from 'react';
 const {connect} = require('react-redux');
-import { browserHistory, Link } from 'react-router';
+import { browserHistory } from 'react-router';
 import pathFor from 'routes/utils/pathFor';
-import stepFor from 'helpers/stepFor';
 
 import { deleteLesson, resetApp } from 'schedule/actions';
 
-import { groupBy } from 'lodash';
 
 import Toggle from 'material-ui/Toggle';
 import { RaisedButton } from "material-ui";
 
 import { CenteredPaper } from 'components/CenteredPaper';
 import { ScheduleTable } from 'components/ScheduleTable';
-import { ILesson } from "services/schedule/models";
+import scheduleService from 'services/schedule/ScheduleService'
 
-const THS = [
-  'Время',
-  'Пн',
-  'Вт',
-  'Ср',
-  'Чт',
-  'Пт',
-  'Сб',
-];
 
-const getLessonsByWeek = state => state.schedule.lessonsData && groupBy(state.schedule.lessonsData.lessons, 'weekIdx');
-
-export const getLessonsForRender = (lessons: ILesson[]): Array<any[]> => {
-  let out = [];
-  const groupedByTime = groupBy(lessons, 'timeStart');
-  const startTimes = Object.keys(groupedByTime);
-
-  const rowsNum = startTimes.length;
-  const colsNum = THS.length;
-
-  for (let i = 0; i < rowsNum; i++) {
-    out[i] = [];
-    for (let j = 0; j < colsNum; j++) {
-      if (j === 0) {
-        out[i][j] = {text: startTimes[i]};
-      } else {
-        const lessonForDay = groupedByTime[startTimes[i]].find(l => l.dayIdx === j - 1);
-        out[i][j] = lessonForDay
-          ?
-          {
-            text: `${lessonForDay.subject} ${lessonForDay.lessonType}`,
-            id: lessonForDay.id
-          }
-          :
-          {text: ''};
-      }
-    }
-  }
-
-  return out;
-
-};
+const THS = scheduleService.TABLE_HEAD;
 
 @connect(
   state => ({
-    lessonsByWeek: getLessonsByWeek(state),
+    lessonsByWeek: state.schedule.lessonsByWeek,
   }),
 )
 class Schedule extends React.Component<any, any> {
@@ -98,8 +56,6 @@ class Schedule extends React.Component<any, any> {
         </CenteredPaper>
     }
 
-    const firstWeekLessons = getLessonsForRender(lessonsByWeek[0]);
-    const secondWeekLessons = getLessonsForRender(lessonsByWeek[1]);
     const {deleteMode} = this.state;
 
     const commonTableProps = {
@@ -122,13 +78,13 @@ class Schedule extends React.Component<any, any> {
         <CenteredPaper width="900px" height="auto" className="mb3 mt3">
           <ScheduleTable
             {...commonTableProps}
-            lessonsForWeek={firstWeekLessons}
+            lessonsForWeek={lessonsByWeek[0]}
           />
         </CenteredPaper>
         <CenteredPaper width="900px" height="auto" className="mb3 mt3">
           <ScheduleTable
             {...commonTableProps}
-            lessonsForWeek={secondWeekLessons}
+            lessonsForWeek={lessonsByWeek[1]}
           />
         </CenteredPaper>
       </div>

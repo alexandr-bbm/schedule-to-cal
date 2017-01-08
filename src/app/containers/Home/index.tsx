@@ -4,7 +4,6 @@ import { getSchedule } from 'schedule/actions'
 import { browserHistory } from 'react-router';
 
 import CircularProgress from 'material-ui/CircularProgress';
-const {VKontakteButton} = require("react-social");
 
 import pathFor from 'routes/utils/pathFor';
 
